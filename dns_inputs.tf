@@ -22,6 +22,12 @@ variable "route53_zone_name" {
   default     = ""
 }
 
+variable "route53_zone_id" {
+  description = "The Route53 zone id to create ACM certificate in and main A-record, without trailing dot"
+  type        = string
+  default     = ""
+}
+
 variable "route53_record_name" {
   description = "The name of Route53 record to create ACM certificate in and main A-record. If `null` is specified, `var.name` is used instead. Provide empty string to point root domain name to ALB"
   type        = string

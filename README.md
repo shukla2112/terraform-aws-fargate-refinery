@@ -84,7 +84,8 @@ module "refinery" {
           "name"  = "SampleRate"
           "value" = 1
         },
-      ]
+      ],
+      rules = []
     },
     {
       dataset_name = "my-test-app",
@@ -113,6 +114,36 @@ module "refinery" {
           "name"  = "AddSampleRateKeyToTraceField"
           "value" = "meta.refinery.dynsampler_key"
         },
+      ],
+      rules = []
+    },
+    {
+      dataset_name = "dataset_for_rules_based_sampling",
+      options = [
+        {
+          "name"  = "Sampler"
+          "value" = "RulesBasedSampler"
+        },
+      ],
+      rules = [
+        {
+            "sample_rate" = 30,
+            "name"       = "customer-1",
+            condition = {
+                "field" =  "customer_id",
+                "operator" = "=",
+                "value" = "customer-1-ad4ad3rfa"
+            }
+        },
+        {
+            "sample_rate" = 20,
+            "name"       = "db-logs",
+            condition    = {
+                "field" =  "type",
+                "operator" = "=",
+                "value" = "database"
+            }
+        }
       ]
     },
   ]
@@ -211,7 +242,7 @@ Using this module also allows integration with existing AWS resources -- VPC, Su
 | refinery\_metrics\_option | The metrics option for refinery | `string` | `"prometheus"` | no |
 | refinery\_metrics\_reporting\_interval | The interval (in seconds) to wait between sending metrics to Honeycomb | `number` | `3` | no |
 | refinery\_peer\_buffer\_size | The number of events to buffer before seding to peers | `number` | `10000` | no |
-| refinery\_sampler\_configs | The Refinery sampling rules configuration | <pre>list(<br>    object(<br>      {<br>        dataset_name = string<br>        options      = list(map(string))<br>      }<br>    )<br>  )</pre> | <pre>[<br>  {<br>    "dataset_name": "_default",<br>    "options": [<br>      {<br>        "name": "Sampler",<br>        "value": "DynamicSampler"<br>      },<br>      {<br>        "name": "SampleRate",<br>        "value": 1<br>      }<br>    ]<br>  }<br>]</pre> | no |
+| refinery\_sampler\_configs | The Refinery sampling rules configuration | <pre>list(<br>    object(<br>      {<br>        dataset_name = string<br>        options      = list(map(string))<br>        rules      = list(object({<br>          sample_rate = number<br>          name        = string<br>          condition   = object({<br>            field = string<br>            operator = string<br>            value = string})<br>       }))<br>      }<br>    )<br>  )</pre> | <pre>[<br>  {<br>    "dataset_name": "_default",<br>    "options": [<br>      {<br>        "name": "Sampler",<br>        "value": "DynamicSampler"<br>      },<br>      {<br>        "name": "SampleRate",<br>        "value": 1<br>      }<br>    ]<br>    "rules": []<br> }<br>]</pre> | no |
 | refinery\_send\_delay | The delay to wait after a trace is complete, before sending | `string` | `"2s"` | no |
 | refinery\_send\_ticker | The duration to use to check for traces to send | `string` | `"100ms"` | no |
 | refinery\_trace\_timeout | The amount of time to wait for a trace to be completed before sending | `string` | `"60s"` | no |

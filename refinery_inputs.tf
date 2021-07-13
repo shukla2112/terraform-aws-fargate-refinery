@@ -120,6 +120,21 @@ variable "refinery_sampler_configs" {
       {
         dataset_name = string
         options      = list(map(string))
+        rules = list(
+          object(
+            {
+              sample_rate = number
+              name        = string
+              condition = object(
+                {
+                  field    = string
+                  operator = string
+                  value    = string
+                }
+              )
+            }
+          )
+        )
       }
     )
   )
@@ -136,7 +151,8 @@ variable "refinery_sampler_configs" {
           "name"  = "SampleRate"
           "value" = 1
         },
-      ]
+      ],
+      rules = []
     },
   ]
 }

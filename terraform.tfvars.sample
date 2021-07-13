@@ -14,6 +14,36 @@ refinery_sampler_configs = [
         "name"  = "SampleRate"
         "value" = 1
       },
+    ],
+    rules = []
+  },
+  {
+    dataset_name = "dataset_for_rules_based_sampling",
+    options = [
+      {
+        "name"  = "Sampler"
+        "value" = "RulesBasedSampler"
+      },
+    ],
+    rules = [
+      {
+          "sample_rate" = 30,
+          "name"       = "customer-1",
+          condition = {
+              "field" =  "customer_id",
+              "operator" = "=",
+              "value" = "customer-1-ad4ad3rfa"
+          }
+      },
+      {
+          "sample_rate" = 20,
+          "name"       = "db-logs",
+          condition    = {
+              "field" =  "type",
+              "operator" = "=",
+              "value" = "database"
+          }
+      }
     ]
   },
 ]
