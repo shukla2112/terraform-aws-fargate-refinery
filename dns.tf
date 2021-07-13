@@ -1,8 +1,8 @@
 data "aws_route53_zone" "this" {
   count = var.create_route53_record ? 1 : 0
 
-  name         = var.route53_zone_name
-  private_zone = false
+  zone_id      = var.route53_zone_id
+  private_zone = true
 }
 
 resource "aws_route53_record" "refinery" {
