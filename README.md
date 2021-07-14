@@ -192,6 +192,7 @@ Using this module also allows integration with existing AWS resources -- VPC, Su
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| acm\_certificate\_enable | Enable or disable the acm_certificate, disable if refinery is being hosted in privately | `bool` | `true` | no |
 | acm\_certificate\_arn | The ARN of a certificate issued by AWS ACM. If empty, a new ACM certificate will be created and validated using Route53 DNS | `string` | `""` | no |
 | acm\_certificate\_domain\_name | The Route53 domain name to use for ACM certificate. Route53 zone for this domain should be created in advance. Specify if it is different from value in `route53_zone_name` | `string` | `""` | no |
 | alb\_additional\_sgs | A list of additional Security Groups to attach to the ALB | `list(string)` | `[]` | no |
