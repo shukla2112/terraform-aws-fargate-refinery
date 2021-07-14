@@ -28,26 +28,33 @@ module "alb" {
     prefix  = var.alb_log_location_prefix
   }
 
-  http_tcp_listeners = [
-    {
-      port        = 80
-      protocol    = "HTTP"
-      action_type = "redirect"
-      redirect = {
-        port        = 443
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
-    },
-  ]
+  http_tcp_listeners = (var.alb_internal && !var.acm_certificate_enable) ? [
+     {
+       port        = 80
+       protocol    = "HTTP"
+       action_type = "redirect"
+       redirect = {
+         port        = 443
+         protocol    = "HTTPS"
+         status_code = "HTTP_301"
+       }
+     },
+   ] : [
+     {
+       port        = 80
+       protocol    = "HTTP"
+       action_type = null
+       redirect    = null
+     },
+   ]
 
-  https_listeners = [
-    {
-      port            = 443
-      protocol        = "HTTPS"
-      certificate_arn = local.certificate_arn
-    },
-  ]
+  https_listeners = (!var.alb_internal && var.acm_certificate_enable) ? [
+     {
+       port            = 443
+       protocol        = "HTTPS"
+       certificate_arn = local.certificate_arn
+     },
+   ] : []
 
   target_groups = [
     {
@@ -81,19 +88,20 @@ resource "aws_security_group_rule" "alb_in_80" {
   description       = "Allow the ALB to receive HTTP traffic from everywhere"
 
   type      = "ingress"
-  from_port = "0"
+  from_port = "80"
   to_port   = "80"
   protocol  = "tcp"
 
-  cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:AWS006
+  cidr_blocks = (var.acm_certificate_enable && !var.alb_internal) ? ["0.0.0.0/0"] : ["${var.vpc_cidr}"] #tfsec:ignore:AWS006
 }
 
 resource "aws_security_group_rule" "alb_in_443" {
+  count = (var.acm_certificate_enable && !var.alb_internal) ? 1 : 0
   security_group_id = aws_security_group.alb.id
   description       = "Allow the ALB to receive HTTPS traffic from everywhere"
 
   type      = "ingress"
-  from_port = "0"
+  from_port = "443"
   to_port   = "443"
   protocol  = "tcp"
 

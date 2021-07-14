@@ -1,3 +1,8 @@
+variable "acm_certificate_enable" {
+  description = "Enable the acm_certificate"
+  default     = true
+  type        = bool
+}
 variable "acm_certificate_arn" {
   description = "The ARN of a certificate issued by AWS ACM. If empty, a new ACM certificate will be created and validated using Route53 DNS"
   type        = string
