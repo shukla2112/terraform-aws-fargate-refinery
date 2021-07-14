@@ -21,7 +21,11 @@ locals {
   vpc_id          = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   certificate_arn = var.acm_certificate_arn == "" ? module.certificate.this_acm_certificate_arn : var.acm_certificate_arn
 
-  refinery_url = "https://${coalesce(
+  refinery_url = var.acm_certificate_enable ? "https://${coalesce(
+    element(concat(aws_route53_record.refinery.*.fqdn, [""]), 0),
+    module.alb.this_lb_dns_name,
+    "_"
+  )}" : "http://${coalesce(
     element(concat(aws_route53_record.refinery.*.fqdn, [""]), 0),
     module.alb.this_lb_dns_name,
     "_"
