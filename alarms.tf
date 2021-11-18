@@ -1,11 +1,20 @@
-module "alb-alarms" {
-  source  = "lorenzoaiello/alb-alarms/aws"
-  version = "1.0.0"
-  load_balancer_id = module.alb.this_lb_arn
-  target_group_id = element(module.alb.target_group_arns, 0)
-  response_time_threshold = 100
-  actions_alarm =  [aws_sns_topic.refinery_alb_alert.id]
-  actions_ok = [aws_sns_topic.refinery_alb_alert.id]
+resource "aws_cloudwatch_metric_alarm" "target_response_time_average" {
+  alarm_name          = "alb-tg-${var.target_group_id}-highResponseTime"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 5
+  metric_name         = "TargetResponseTime"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 100
+  alarm_description   = "Average API response time is too high"
+  alarm_actions       = ["${aws_sns_topic.refinery_alb_alert.id}"]
+  ok_actions          = ["${aws_sns_topic.refinery_alb_alert.id}"]
+
+  dimensions = {
+    "TargetGroup"  = element(module.alb.target_group_arns, 0)
+    "LoadBalancer" = module.alb.this_lb_arn
+  }
 }
 
 resource "aws_sns_topic" "refinery_alb_alert" {
