@@ -12,8 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time_average" {
   ok_actions          = ["${aws_sns_topic.refinery_alb_alert.id}"]
 
   dimensions = {
-    "TargetGroup"  = element(module.alb.target_group_arns, 0)
-    "LoadBalancer" = module.alb.this_lb_arn
+    "LoadBalancer" = module.alb.this_lb_arn_suffix
   }
 }
 
