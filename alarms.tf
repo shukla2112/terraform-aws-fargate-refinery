@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "target_response_time_average" {
-  alarm_name          = "alb-tg-${var.target_group_id}-highResponseTime"
+  alarm_name          = "alb-tg-${element(module.alb.target_group_arns, 0)}-highResponseTime"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 5
   metric_name         = "TargetResponseTime"
